@@ -1,15 +1,18 @@
 import React, { Component, Fragment, } from 'react';
 import NavBar from './component/layout/NavBar'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import Users from './component/user/Users';
+import User from './component/user/User';
 import axios from 'axios'
 import Search from './component/user/Search';
+import  About  from './component/pages/About';
 import './component/Form.css';
 import './App.css';
 
 class App extends Component {
   state = {
     users: [],
+    user: {},
     loading: false,
     alert: null
   }
@@ -20,36 +23,41 @@ class App extends Component {
       this.setState({ users: res.data.items, loading: false})
     };
 
+    // Get single Github user
+    getUser = async (username) => {
+      this.setState({ loading: true})
+      const res = await axios.get(`https://api.github.com/users?q=${username}`);
+      this.setState({ user: res.data, loading: false})
+    }
+
     // Clear users from state
     clearUsers = () => this.setState({ users: [], loading: false});
     // Set alert alert
-   
 
   render() {
-          const { users, loading } = this.state; 
+    
+    const { users, user, loading } = this.state;
 
             return (
               <Router>
                   <div className='App'>
                     <NavBar />
                     <div className='container'>
-                    
                     <Fragment>
-                           <Search searchUsers={this.searchUsers}
-                              clearUsers={this.clearUsers}
-                              showClear={users.length > 0 ? true : false}
-                              />  
-                           <Users loading={loading}
-                              users={users}/>
-                        </Fragment>
-                      
-                      <Routes>
-                          <Route exact path='/' render={props => {
-                          
-                          }}
-                          />
-                      </Routes>
-                      
+                        <Search searchUsers={this.searchUsers}
+                          clearUsers={this.clearUsers}
+                          showClear={users.length > 0 ? true : false}
+                          />  
+                        <Users loading={loading}
+                          users={users}/>
+                    </Fragment>
+                    <Routes>   
+                      <Route exact path='/about' component={About}/>
+                      <Route exact path='/user/:login' render={props => {
+                        <User {...props } getUser={this.getUser}
+                           user={user} loading={loading} />
+                      }} />
+                    </Routes>       
                     </div>
                   </div>
               </Router>
@@ -59,9 +67,14 @@ class App extends Component {
    
 }
 
+
+
 export default App;
 
 /* 
+<Routes>
+        <Route exact path='/' render={(props) => {}}/>
+</Routes>
 <Alert alert={this.state.alert} />
 Admin URL: https://app.netlify.com/sites/gallant-khorana-3a7eac  
 URL:       https://gallant-khorana-3a7eac.netlify.app

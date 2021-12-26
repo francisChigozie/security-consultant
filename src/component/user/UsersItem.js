@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const UsersItem = ({user: { login, avatar_url, html_url} }) => {
 
